@@ -1,6 +1,6 @@
 #Running the Spark-notebook on a Kubernetes google cloud cluster
 
-Modern data intensive applications rely on distributed computing and storage to leverage scalability and reliability. We will work with Kubernetes on google cloud for the infrastructure layer, but any cloud vendor with a kubernetes service or on premise install of a kubernetes cluster would work. Spark is a popular computing framework and the spark-notebook is used to submit jobs interactivelly.
+Modern data intensive applications rely on distributed computing and storage to leverage scalability and reliability. Frameworks and infrastructure are required to get a running environment, we will work with Kubernetes on google cloud for the infrastructure layer. Of course, any cloud vendor with a kubernetes service or an on premise install of a kubernetes cluster would work. Spark is a popular computing framework and the spark-notebook is used to submit jobs interactivelly.
 
 In this blog, you will learn how to configure a set-up for the spark-notebook to work with kubernetes, in the context of a google cloud cluster.
 
@@ -10,15 +10,15 @@ In this blog, you will learn how to configure a set-up for the spark-notebook to
 
 Spark is one of the post popular distributed computing framework, it was developed as a functional programming enabled version of the map-reduce paradigm with an in-memory caching mechanism to impove performance.
 
-Spark is developed in Scala and provides python and R apis.
-Scala spark jobs can be submitted to a spark cluster by 2 main mechanism, either as a submitted application (a jar), or through interactive sessions with a REPL. In both case, the REPL or application need to instanciate a `SparkSession` object, this spark session being the gateway in the application to submit tasks to a spark cluster.
+Spark is developed in Scala and provides python and R apis. 
+Scala spark jobs can be submitted to a spark cluster by two main mechanism, either as a submitted application (a jar), or through interactive sessions with a REPL. In both case, the REPL or application need to instanciate a `SparkSession` object, this spark session being the gateway in the application to submit tasks (execute functions) to a spark cluster.
 
-Modern data science is using extensively notebooks, i.e. user interfaces to interact with a computing environment. The spark-notebook is providing the user with web pages for editing code and execute this code in a scala REPL with a SparkSession. This Spark Session can be configured to connect any kind of spark enabled cluster.
+Modern data science is extensively using notebooks, i.e. user interfaces to interact with a computing environment. The spark-notebook is providing the user with web pages for editing code and execute this code in a scala REPL with a SparkSession. This Spark Session can be configured to connect any kind of spark enabled cluster.
 
 Spark has several cluster options:
 
 * *local*: no cluster, just the local resources are used
-* *standalone*: the spark native cluster, spark executor has to be started on each node (static set-up).
+* *standalone*: the spark native cluster, a spark executor has to be started on each node (static set-up).
 * *YARN*: the Hadoop yarn scheduler is used to dispatch tasks on a Hadoop cluster
 * *mesos*: the spark framework is running on Mesos, instanciating executors/driver on the mesos cluster.
 * *Kubernetes*: spark executor/driver are scheduled by kubernetes.
@@ -26,18 +26,18 @@ Spark has several cluster options:
 
 ### 1.2 Kubernetes
 
-Kubernetes is a system to automate deployment of containerized applications. In the context of spark, it means spark executors will run as containers.
-The spark driver also can be run in kubernetes as a container, this is the so-called `cluster` mode available for spark-submit command.
+Kubernetes is a system to automate the deployment of containerized applications. In the context of spark, it means spark executors will run as containers. 
+The spark driver also can be run in kubernetes as a container, this is the so-called `cluster` mode available for spark-submit command. 
 
-There are many solutions to get a kubernetes instance running, either single local node for testing, or full production set-up on premises or cloud-based: [https://kubernetes.io/docs/setup/pick-right-solution/]()
+There are many solutions to get a kubernetes instance running, either single local node for testing, or full production set-up on premises or cloud-based, see: [https://kubernetes.io/docs/setup/pick-right-solution/]()
 
-We are showing an example on Google Kubernetes Engine so we have a real  multinode cluster without the burden of installation. Alternativelly, Minikube is the popular way to get started with kubernetes in single local node.
+We will work on Google Kubernetes Engine so we have a real multinode cluster without the burden of installation. Alternativelly, Minikube is the popular way to get started with kubernetes in single local node.
 
 From a user perspective, kubernetes is used with the `kubectl` command. `kubectl` must connect to a kubernetes master node to request execution of commands. The scope here is to get kubectl, and configure it to connect to the (gcloud) kubernetes cluster. Spark is dealing for us with the use of kubectl to deploy the spark-executor/driver containers.
 
 ### 1.3 gcloud
 
-Google cloud is an extensive suite of services, from infrastructure to AI, storage, or application deployment. Major cloud services vendors like Amazon and Azure provide equivalent servcices and could be substitued for your needs.
+Google cloud is an extensive suite of services, from infrastructure to AI, storage, or application deployment. Major cloud services vendors like Amazon and Azure provide equivalent services and could be substitued for your needs.
 
 In this blog, we use specifically the *Kubernetes Engine* and the *Container Registry*.
 
@@ -60,7 +60,7 @@ We assume here you have a project named `spark-kubernetes` and the project id ge
 
 <img src="img/create-project.png" alt="drawing" width="400" border=1/>
 
-#### Install and configure gcloud
+#### Install and configure gcloud 
 
 Install gcloud on your machine, I used homebrew on my MacBook:
 
@@ -68,7 +68,7 @@ Install gcloud on your machine, I used homebrew on my MacBook:
 brew cask install google-cloud-sdk
 ```
 
-Of course, any of these methods is an alternative option depending on your set-up:
+Alternative install options are available for different platforms:
 
 [https://cloud.google.com/sdk/install]()
 
@@ -130,16 +130,16 @@ $ kubectl config current-context
 gke_spark-kubernetes-224613_europe-west1-b_spark-cluster
 ```
 
-The context is connecting to the Google Kubernetes cluster we just created. We are ready to work with our infrastructure with kubernetes now.
+The context is connecting to the Google Kubernetes cluster we just created. We are ready to work with our infrastructure on kubernetes now.
 
 ### 2.3 Spark install and config
 
 Spark on kubernetes started at version 2.3.0, in cluster mode where a jar is submitted and a spark driver is created in the cluster (cluster mode of spark).
-From Spark version 2.4, the client mode is enables. This mode is required for spark-shell and notebooks, as the driver is the spark-shell jvm itself.
+From Spark version 2.4, the client mode is enabled. This mode is required for spark-shell and notebooks, as the driver is the spark-shell jvm itself. 
 
 To run spark on kubernetes, spark docker images must be available on a registry. We will push these images on the google registry of our project.
 
-Spark proivides a tool to build images and push to a registry. It would be possible to extend these base images in more advanced cases, for example where you want some libraries to be intalled on spark executors.
+Spark provides a tool to build images and push to a registry. It would be possible to extend these base images in more advanced cases, for example where you want some libraries to be intalled on spark executors.
 
 #### Download and install
 
@@ -153,7 +153,7 @@ I installed version 2.4.0 for hadoop 2.7, in ` /opt`:
 cd /opt/spark-2.4.0-bin-hadoop2.7/
 ```
 
-For referencem the Dockerfile to build the images are in the `kubernetes` subdirectory, and the docker tool is in `bin`.
+For reference, the Dockerfile to build the images are in the `kubernetes` subdirectory, and the docker tool is in `bin`.
 
 #### Publish spark images to docker registry
 
@@ -161,14 +161,14 @@ Note: it is assumed you have docker installed and running on your machine.
 
 First, you need to build the spark images, we basically follow here the spark documentation on [https://spark.apache.org/docs/latest/running-on-kubernetes.html]()
 
-The google repository for our `spark-kubernetes-224613` project is (located in Europe), and we specify a tag `test-tag`:
+The google repository for our `spark-kubernetes-224613` project is on `eu.gcr.io` (located in Europe), and we specify a tag `test-tag`:
 
 ```
 $ ./bin/docker-image-tool.sh -r eu.gcr.io/spark-kubernetes-224613 -t test-tag build
 $ ./bin/docker-image-tool.sh -r eu.gcr.io/spark-kubernetes-224613 -t test-tag push
 ```
 
-3 docker container images should appear in your project:
+Three docker container images should appear in your project:
 
 <img src="img/registry.png" alt="drawing" width="600" border=1/>
 
@@ -179,7 +179,7 @@ Only the `spark` image is of interest here, the others provide support for the p
 
 The principle behind spark on kubernetes is that a `SparkSession` is configured to request resources, i.e. executors with some memory and CPU. In. order to do this, the Spark application must access the `kubectl` command, with rights to hit to the kubernetes cluster API endpoint and create pods (run containers), this is a first problem to solve. At the same time, to execute tasks, the Spark driver must be accessible from the executors with an IP or hostname, this is a second issue to be addressed.
 
-We cannot have a spark driver running on the development environment easily. The driver will have to run inside the kubernetes cluster as a pod with the right configuration, and access to kubectl. Within the kubernetes cluster, the driver and the executor communicate easily, the network being open.
+We cannot have a spark driver running on the development environment and easily get this networking requirement. The driver will have to run inside the kubernetes cluster as a pod with the right configuration, and access to kubectl. Within the kubernetes cluster, the driver and the executor communicate easily, the network being open.
 
 The spark documentation explains how to submit jobs with spark-submit:
 
@@ -199,7 +199,7 @@ The spark documentation explains how to submit jobs with spark-submit:
 
 We need to set-up a solution to get a REPL started (`spark-shell`) with access to kubectl, and within the cluster.
 
-#### Service Accounts, Roles, and Role Bindings
+#### Service Accounts, Roles, and Role Bindings 
 
 So far, `kubectl` was used by us, a human user. From within the pod hosting the Spark REPL (or notebook), it has to be a *Service Account* using kubectl. This account will have to be bound to some Role, granting rights to create pods for our executors.
 
@@ -218,6 +218,8 @@ metadata:
   name: spark-notebook
 EOF
 ```
+
+Note how kubernetes commands are executed by parsing yaml configuration files.
 
 We bind the `edit` role at the cluster level (allowing to create pods) to the `spark-notebook` Service Account we just created:
 
@@ -268,7 +270,7 @@ Without the `spark-notebook` Account Service, it wouldn't be allowed.
 
 #### Expose the driver to executors: Headless Service
 
-We know that the driver has to be accessible from the executors. The default spark set-up gives a hostname to the driver that is not working, so we need to fix it. This is done with the concept of kubernetes Services.
+We know that the driver has to be accessible from the executors. The default spark set-up gives a hostname to the driver that is not working, so we need to fix it. This is done with the concept of kubernetes Services. 
 
 A *headless* service will expose the pod, but without loadbalancer or IP, just with a chosen hostname, we do this from the development machine to expose the pod with label *app=sparkdriver*.
 
@@ -294,7 +296,7 @@ With this service up, the pod will resolve to `sparkdriver` and we will just nee
 
 #### Manual test for spark-shell (REPL)
 
-We can now test if the spark REPL can get executors up on the kubernetes cluster and task executed, this is the last requirement before working on the spark-notebook deplopyment.
+We can now test if the spark REPL can get executors up on the kubernetes cluster and execute tasks, this is the last requirement before working on the spark-notebook deployment.
 
 ##### Prepare spark-shell driver pod
 
@@ -313,7 +315,7 @@ nslookup: can't resolve '(null)': Name does not resolve
 
 Name:      sparkdriver
 Address 1: 10.20.2.40 spark-notebook-f58966f-4292z
-```
+``` 
 
 We install kubectl (for the spark-notebook, we will create a custom docker image...):
 
@@ -506,12 +508,12 @@ And we create this deployment in our cluster:
 kubectl create -f spark-notebook.yml
 ```
 
-The appliocation is started after a little while:
+The application is started after a little while:
 
 <img src="img/spark-notebook-workload.png" alt="drawing" width="700" border=1/>
 
 
-We need to expose the spark-notebook for us to use it, we could use a loadBalancer and expose it to the public, but it would require to configure some security.
+We need to expose the spark-notebook for us to use it, we could use a loadBalancer and expose it to the public, but it would require to configure some security. 
 
 Instead, port forwarding will work to get a simple private access to the application:
 
@@ -594,7 +596,7 @@ We also got to see how gcloud is providing kubernetes clusters to work with.
 
 ## Where to go from here
 
-There is still quite some way to cover in order to have a fully working environment. The details will be discussed in a separate post:
+There is still quite some way to cover in order to have a fully working environment. The details will be discussed in a second post, with shared code:
 
 **Default notebook configuration**
 
@@ -606,10 +608,13 @@ Working through port forwarding is not the way to go in a team using the spark-n
 
 **Deal with state**
 
-Notebooks are json files stored on the local filesystem of the server. Failure/restart of the spark-notebook pod will result in loss of the work.
+Notebooks are json files stored on the local filesystem of the server. Failure/restart of the spark-notebook pod will result in loss of the work. 
 
 The spark-notebook integrates with git, and kubernetes provides persistent volumes, this would allow to retain the state of the application (notebook persistence).
 
 **Productize as a configurable recipe**
 
-With an understanding of the deployment details, it would be good to work on organising the code the provide easy to use recipes to deploy pre-configured spark-notebook environments, eventually providing java dependencies for advanced spark use cases.
+With an understanding of the deployment details, it would be good to work on organising the code and provide easy to use recipes to deploy pre-configured spark-notebook environments, even providing java dependencies for advanced spark use cases.
+
+
+
